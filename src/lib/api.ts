@@ -4,7 +4,12 @@
  * @param image The food image file
  * @returns Promise with the calorie data
  */
-export async function calculateCalories(foodName: string, image: File): Promise<{ kcal: number }> {
+export async function calculateCalories(foodName: string, image: File): Promise<{
+    kcal: number,
+    carbohydrates: number,
+    proteins: number,
+    fats: number
+}> {
   // Create a FormData object to send multipart/form-data
   const formData = new FormData();
   formData.append('food_name', foodName);

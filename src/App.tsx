@@ -13,13 +13,16 @@ function App() {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [calories, setCalories] = useState<number | null>(null);
+  const [carbohydrates, setCarbohydrates] = useState<number | null>(null);
+  const [proteins, setProteins] = useState<number | null>(null);
+  const [fats, setFats] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleImageChange = (file: File | null) => {
     setSelectedImage(file);
     setError(null);
-    
+
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -33,23 +36,26 @@ function App() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!foodName.trim()) {
       setError("Please enter a food name");
       return;
     }
-    
+
     if (!selectedImage) {
       setError("Please upload a food image");
       return;
     }
-    
+
     setIsLoading(true);
     setError(null);
-    
+
     try {
       const result = await calculateCalories(foodName, selectedImage);
       setCalories(result.kcal);
+      setCarbohydrates(result.carbohydrates);
+      setProteins(result.proteins);
+      setFats(result.fats);
     } catch (err) {
       setError("Failed to calculate calories. Please try again.");
       console.error(err);
@@ -65,7 +71,7 @@ function App() {
           <h1 className="text-3xl font-bold">Food Calorie Calculator</h1>
           <p className="text-gray-500">Upload a food image and get calorie information</p>
         </div>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="food-name">Food Name</Label>
@@ -76,27 +82,32 @@ function App() {
               onChange={(e) => setFoodName(e.target.value)}
             />
           </div>
-          
-          <FoodImageUploader 
+
+          <FoodImageUploader
             onImageChange={handleImageChange}
             imagePreview={imagePreview}
           />
-          
+
           {error && (
             <div className="text-red-500 text-sm">{error}</div>
           )}
-          
-          <Button 
-            type="submit" 
-            className="w-full" 
+
+          <Button
+            type="submit"
+            className="w-full"
             disabled={isLoading}
           >
             {isLoading ? "Calculating..." : "Calculate Calories"}
           </Button>
         </form>
-        
+
         {calories !== null && (
-          <FoodCalorieResult calories={calories} />
+          <FoodCalorieResult
+            calories={calories}
+            carbohydrates={carbohydrates}
+            proteins={proteins}
+            fats={fats}
+          />
         )}
       </Card>
     </div>
